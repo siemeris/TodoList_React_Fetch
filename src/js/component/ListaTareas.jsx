@@ -1,22 +1,10 @@
-import React, {useState} from "react";
-
-
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
-
-import "../api.js";
+import React, {useState, useEffect} from "react";
 
 //create your first component
 const ListaTareas = () => {
-		// const [inputValue, setInputValue ] = React.useState('');
-		
-		// const validateInput = () => {
-		//   if(inputValue === "") alert("No task, please add a task");
-		//   else alert("All perfect!");
-		// };
 
 		const [tarea, setTarea] = useState('');
-		const [lista, setLista] = useState([]);
+		const [lista, setLista] = useState(null);
         const [esOculto, setEsOculto] = useState('hidden');
 
 		const funcionEliminar = indiceElemento =>{
@@ -25,6 +13,61 @@ const ListaTareas = () => {
 			setLista(newArr)
 		 }
 		
+	useEffect(()=>{fetch('https://assets.breatheco.de/apis/fake/todos/user/siemeris', {
+		method: "GET",
+		//body: JSON.stringify(),
+		headers: {
+		  "Content-Type": "application/json"
+		}
+	  })
+	  .then(resp => {
+		  if (resp.ok){
+			console.log("El request se hizo bien")
+			return resp.json();
+		  }
+		  else {
+			console.log("Hubo un Error " + resp.status + " en el request")
+		  }
+	  })
+	  .then(body => {
+		   //here is were your code should start after the fetch finishes
+		  console.log("Este es el body del request", body); //this will print on the console the exact object received from the server
+		  console.log(body.map(t=>t.label))
+		  setLista(body.map(t=>t.label))
+		  })
+	  .catch(error => {
+		   //error handling
+		   console.error("ERROR:", error);
+	   });},[]);
+
+
+	useEffect(()=>{
+		if (lista != null) {
+				fetch("https://assets.breatheco.de/apis/fake/todos/user/siemeris", {
+					method: "PUT",
+					body: JSON.stringify(lista.map(item => ({ label: item, done: false }))),
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+				.then(res => {
+					if (res.ok){
+					  console.log("El request del PUT se hizo bien")
+					  return res.json();
+					}
+					else {
+					  console.log("Hubo un Error " + res.status + " en el request del PUT")
+					}
+				})
+				.then(async response => { console.log("Success", await response)})
+				.catch(error => console.error(error))
+			}
+		})
+		
+	if (lista == null) {
+		return null;
+	}
+
 	return (<div className="container border w-50 shadow mt-4 p-0">
 			<input 
 				className="form-control border-bottom w-100 mt-1" 
