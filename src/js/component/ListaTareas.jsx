@@ -12,6 +12,13 @@ const ListaTareas = () => {
 		setLista(newArr);
 	};
 
+	const funcionAñadir = (evento) => {
+		if (evento.keyCode === 13) {
+			setLista([...lista, tarea]);
+			setTarea("");
+		}
+	};
+
 	useEffect(() => {
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/siemeris", {
 			method: "GET",
@@ -80,11 +87,7 @@ const ListaTareas = () => {
 				placeholder="Add tasks"
 				onChange={(e) => setTarea(e.target.value)}
 				value={tarea}
-				onKeyUp={(event) =>
-					event.keyCode === 13
-						? setLista([...lista, tarea]) && setTarea("")
-						: setLista
-				}
+				onKeyUp={(event) => funcionAñadir(event)}
 			/>
 			<div className="w-100">
 				<ul className="list-group">
